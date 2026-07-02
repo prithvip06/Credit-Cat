@@ -44,7 +44,7 @@ Pipeline: bucket features → one-hot encode categoricals → log-transform heav
 ## 5. Limitations
 
 - Features are anonymized; friendly interpretations are inferred, not confirmed (see §7). One flag (A9) behaves opposite to a "prior default" reading, which we flag rather than trust.
-- The 2-D PCA map captures ~35% of total variance — a simplified view; clusters that overlap in 2-D may separate in full space.
+- The 2-D PCA map captures ~39% of total variance (25.6% + 13.1%) — a simplified view; clusters that overlap in 2-D may separate in full space.
 - `Class` reflects past human lending decisions and may carry historical bias; we use it only for validation/context, never as a target.
 - Small dataset (689 rows); segments are descriptive, not predictive.
 
@@ -54,21 +54,21 @@ See `RESPONSIBLE_AI.md` (≤200-word statement). In brief: never a prediction or
 
 ## 7. Column Name Assignments
 
-*(Intentionally left blank — to be completed.)* Our inferred, plain-language interpretations of A1–A14 (with confidence and rationale) will be documented here. Until then, A1–A14 remain the canonical keys; any friendly labels in the app are presented as inferred, not ground truth.
+Our inferred, plain-language interpretations of A1–A14, based on distribution shape, approval-rate correlation, and domain knowledge of credit applications (full working in `notebooks/Variable_Justification.ipynb`). These are **evidence-based hypotheses, not confirmed definitions** — the dataset is anonymized and we have no ground truth to check against.
 
 | Code | Inferred name | Confidence | Rationale |
 |---|---|---|---|
-| A1 | | | |
-| A2 | | | |
-| A3 | | | |
-| A4 | | | |
-| A5 | | | |
-| A6 | | | |
-| A7 | | | |
-| A8 | | | |
-| A9 | | | |
-| A10 | | | |
-| A11 | | | |
-| A12 | | | |
-| A13 | | | |
-| A14 | | | |
+| A1 | Gender (0=Male, 1=Female) | Medium | Binary, 2 values. Approval-rate gap is essentially zero (−0.013), consistent with a protected characteristic that shouldn't legitimately drive a lending decision. |
+| A2 | Age | High | Continuous, 350 unique values, range 13.75–80.25; decimal precision fits self-reported age. Approved applicants average ~3.85 years older, consistent with longer credit histories being viewed favorably. |
+| A3 | Years Employed | Medium | Continuous, 0–28, decimal precision suggests tenure. Approved applicants average 2.07 more years employed. *Caveat:* range overlaps closely with A7 below, so a swap between the two is plausible — we kept the pairing that produced the cleaner "employment vs. residence" split. |
+| A4 | Marital Status (1=Single, 2=Married, 3=Divorced/Widowed) | Medium | Exactly 3 categories, weak approval gap (+0.168), matches a field commonly collected on credit applications. |
+| A5 | Creditworthiness Tier | Low (uncertain) | 14 categories with a strong ordinal-looking approval gradient, but we deliberately one-hot encoded it as *unordered* per our preprocessing spec — in tension with a "tier" reading. We surface this contradiction rather than resolve it with false confidence. |
+| A6 | Occupation Type | Medium | 8 categories; one catch-all bucket dominates (408/690). Approval pattern is non-ordinal and messier than A5's, consistent with a self-reported nominal field like occupation. |
+| A7 | Years at Current Address | Medium | Continuous, 0–28.5, decimal precision. Approved applicants average 2.17 more years at address. Same A3/A7 swap caveat noted above. |
+| A8 | Currently Employed | High | Binary. Largest approval-rate gap of any column in the dataset (+0.717) — unemployed applicants are denied 93% of the time. The strongest, cleanest signal we found. |
+| A9 | Prior Default | Medium | Binary, second-largest approval gap (+0.460). *Polarity note:* unlike our other binary flags (where 1 = "yes"), the data only makes sense if A9=0 means "has a prior default." We use that reading here; anyone reusing this column elsewhere should double check the polarity rather than assume 1=true. |
+| A10 | Debt (Thousands) | Medium | Integer, 0–67, heavily zero-inflated (395/690 at 0). One high-debt outlier (67, i.e. ~$67k) was still approved — explained by cross-referencing high income (A14), consistent with a debt-to-income story. |
+| A11 | Driver's License | Medium | Binary, smallest approval-rate gap of any column (+0.032) — essentially a non-financial identifier collected on the application, not a credit signal. We initially hypothesized this as a second default flag; the near-zero correlation ruled that out. |
+| A12 | Citizenship Status (1=Citizen, 2=Permanent Resident, 3=Non-Immigrant) | Medium | Exactly 3 categories, weak approval gap (+0.069), maps cleanly onto categories collected on U.S. financial applications. |
+| A13 | Credit Balance | High | Continuous, 0–2,000, heavily right-skewed (justifying the log-transform), negatively correlated with approval (−$34.60 avg. gap) — consistent with an outstanding-balance figure, not a geographic code. **Cleanup note:** the saved model artifact previously carried a stale, less-scrutinized label of "Zip Code (uncertain)" for this column, left over from an earlier iteration and never reconciled with this analysis. We traced the inconsistency and corrected it — see `CHANGELOG.md`. |
+| A14 | Annual Income | High | 240 unique values, range $1–$100,001 — the largest approval gap of any column (+$1,840 avg.). The $100,001 ceiling is a well-known artifact of this dataset family and rules out competing reads like credit score (tops out far lower) or income-in-thousands (implausibly large at that ceiling). |

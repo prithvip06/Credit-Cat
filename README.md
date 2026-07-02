@@ -2,11 +2,13 @@
 
 **A self-discovery tool that shows credit-card applicants which group of similar applicants they most resemble — what it means, what they might qualify for, and what actually moves their profile forward. Built for the applicant, not the bank.**
 
-Datathon 2026 · **Pillar 2 — Unsupervised ML ("Find Your Cluster")** · Team: Emmet & Prithvi
+Built for CSULB Datathon 2026 · **Pillar 2 — Unsupervised ML ("Find Your Cluster")** · Team: Emmet Gingerich & Prithvi Prasad
 
-## Contact:
-Emmet Gingerich: egingeri@lion.lmu.edu - (206) - 240- 7632
-Prithvi Prasad: prithvi11prasad@gmail.com - (661) - 202 - 7440
+**About this repo:** this is a personal fork of our joint datathon submission, extended afterward as a portfolio project — see [`PERSONAL_NOTE.md`](PERSONAL_NOTE.md) for why, and [`CHANGELOG.md`](CHANGELOG.md) for exactly what changed and when. The original two-day build is credited to both of us; everything under "Portfolio cleanup" in the changelog is mine.
+
+## Contact
+Emmet Gingerich: egingeri@lion.lmu.edu
+Prithvi Prasad: prithvi11prasad@gmail.com
 
 ---
 
@@ -29,14 +31,17 @@ credit-cat/
 ├── models/
 │   └── cluster_model.joblib    # trained model + scaler + PCA + metadata
 ├── notebooks/
-│   └── Clustering_Story.ipynb  # all training code, told as a narrative
+│   ├── Clustering_Story.ipynb        # all training code, told as a narrative
+│   └── Variable_Justification.ipynb  # column-by-column inference behind MODEL_REPORT.md §7
 ├── docs/                       # specification documents (see "How we built it")
 │   ├── system-requirements.md
 │   ├── backend.md
 │   └── frontend.md
 ├── MODEL_REPORT.md             # 1-page model report (approach, validation, limitations)
 ├── RESPONSIBLE_AI.md           # required Responsible-AI statement
+├── PERSONAL_NOTE.md            # why this repo exists past the datathon deadline
 ├── CHANGELOG.md
+├── .gitignore
 └── README.md
 ```
 
